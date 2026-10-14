@@ -10,7 +10,10 @@ fun produkDiAtasHarga(produk: List<Product>, minHarga: Int): List<String> {
     // TODO 2: Urutkan (sortedBy) hasil saringan dari harga termurah
     // TODO 3: Ubah (map) menjadi List<String> berisi nama produk saja
 
-    return emptyList()
+    return produk
+        .filter { it.harga > minHarga }
+        .sortedBy { it.harga }
+        .map { it.nama }
 }
 
 fun main() {
