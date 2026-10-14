@@ -9,18 +9,22 @@
 // Sealed class membatasi semua subclass-nya harus diketahui di compile time,
 // sehingga `when` bisa exhaustive tanpa perlu cabang "else".
 // sealed class NetworkResult
+sealed class NetworkResult
 
 // TODO 2: Buat NetworkResult.Loading sebagai "object" (tidak butuh data tambahan),
 // turunan dari NetworkResult.
 // object Loading : NetworkResult()
+object Loading : NetworkResult()
 
 // TODO 3: Buat NetworkResult.Success sebagai "data class" yang membawa property
 // data: String, turunan dari NetworkResult.
 // data class Success(val data: String) : NetworkResult()
+data class Success(val data: String) : NetworkResult()
 
 // TODO 4: Buat NetworkResult.Error sebagai "data class" yang membawa property
 // message: String, turunan dari NetworkResult.
 // data class Error(val message: String) : NetworkResult()
+data class Error(val message: String) : NetworkResult()
 
 fun describe(result: NetworkResult): String {
     // TODO 5: Gunakan `when` exhaustive (tanpa "else") untuk menangani ketiga
