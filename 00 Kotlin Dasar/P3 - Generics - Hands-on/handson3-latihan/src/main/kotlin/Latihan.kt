@@ -11,7 +11,7 @@ open class Animal(val name: String)
 class Cat(name: String) : Animal(name)
 
 // TODO 1: Tambahkan modifier variance yang tepat pada T di sini
-interface Container<T> {
+interface Container<out T> {
     fun get(): T
 }
 
