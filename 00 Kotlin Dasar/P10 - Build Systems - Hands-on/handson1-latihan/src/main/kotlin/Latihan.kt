@@ -12,13 +12,20 @@ import java.util.Properties
 fun main() {
     // TODO 1: Ambil InputStream untuk "app.properties" lewat classloader.
     //   Gunakan: object {}.javaClass.classLoader.getResourceAsStream("app.properties")
-    val inputStream = null // TODO: ganti dengan pemanggilan getResourceAsStream
+    val inputStream = object {}.javaClass.classLoader.getResourceAsStream("app.properties")
+
+    if (inputStream == null) {
+        println("File app.properties tidak ditemukan di classpath!")
+        return
+    }
 
     // TODO 2: Load InputStream tersebut ke dalam java.util.Properties
     val properties = Properties()
-    // properties.load(inputStream)
+    inputStream.use { stream ->
+        properties.load(inputStream)
+    }
 
     // TODO 3: Ambil dan tampilkan nilai "app.name" dan "app.version"
-    // println("Nama aplikasi: ${properties.getProperty("app.name")}")
-    // println("Versi: ${properties.getProperty("app.version")}")
+    println("Nama aplikasi: ${properties.getProperty("app.name")}")
+    println("Versi: ${properties.getProperty("app.version")}")
 }
