@@ -1,5 +1,6 @@
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.full.findAnnotation
+import kotlin.reflect.jvm.javaField
 
 // Hands-on 3: Custom Annotation + Reflection Validator
 // Tugas: Buat annotation class @Required, lalu fungsi validate(obj) yang
@@ -13,7 +14,10 @@ import kotlin.reflect.full.findAnnotation
 //         Jangan lupa @Target(AnnotationTarget.FIELD) dan
 //         @Retention(AnnotationRetention.RUNTIME) — tanpa RUNTIME,
 //         annotation tidak akan terbaca saat reflection!
-// annotation class Required
+@Target(AnnotationTarget.PROPERTY, AnnotationTarget.PROPERTY)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class Required
+
 
 data class RegistrasiForm(
     @Required val nama: String,
@@ -25,14 +29,23 @@ fun validate(obj: Any): List<String> {
     val gagal = mutableListOf<String>()
 
     // TODO 2: Iterasi memberProperties dari obj::class
-    // TODO 3: Untuk tiap property, cek apakah punya annotation @Required
-    //         dengan property.javaField?.getAnnotation(Required::class.java) != null
-    //         (atau bila menganotasi property Kotlin: findAnnotation<Required>())
-    // TODO 4: Jika beranotasi @Required, ambil nilainya dengan property.getter.call(obj)
-    // TODO 5: Jika nilai null ATAU (String dan blank), tambahkan property.name ke `gagal`
+    for (prop in obj::class.memberProperties) {
+        // TODO 3: Untuk tiap property, cek apakah punya annotation @Required
+        //         dengan property.javaField?.getAnnotation(Required::class.java) != null
+        //         (atau bila menganotasi property Kotlin: findAnnotation<Required>())
+        val hasRequired = prop.findAnnotation<Required>() != null ||
+                prop.javaField?.getAnnotation(Required::class.java) != null
 
-    // Kode kamu di sini...
-
+        if (hasRequired) {
+            // TODO 4: Jika beranotasi @Required, ambil nilainya dengan property.getter.call(obj)
+            val value = prop.getter.call(obj)
+            // TODO 5: Jika nilai null ATAU (String dan blank), tambahkan property.name ke `gagal`
+            val isInvalid = value == null || (value is String && value.isBlank())
+            if (isInvalid) {
+                gagal.add(prop.name)
+            }
+        }
+    }
     return gagal
 }
 
