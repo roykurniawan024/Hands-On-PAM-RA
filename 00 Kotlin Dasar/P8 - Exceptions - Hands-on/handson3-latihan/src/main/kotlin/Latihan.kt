@@ -13,6 +13,9 @@ fun parseTiket(input: String): Tiket {
     // TODO 1: Gunakan require() untuk memastikan bagian.size == 2,
     //         jika tidak, lempar IllegalArgumentException dengan pesan
     //         "Format harus 'nama/umur', diterima: $input"
+    require(bagian.size == 2) {
+        "Format harus 'nama/umur', diterima: $input"
+    }
 
     val nama = bagian[0]
 
@@ -21,10 +24,16 @@ fun parseTiket(input: String): Tiket {
     //         bagian[1] menjadi Int bernama `umur`. Jika gagal parsing,
     //         panggil error("Umur tidak valid: ${bagian[1]}") di blok catch
     //         (error() melempar IllegalStateException).
-    val umur: Int = ??? // <-- ganti dengan try-as-expression di atas, ini sengaja error compile
+    val umur: Int = try {
+        bagian[1].toInt()
+    } catch (e: NumberFormatException) {
+        error("Umur tidak valid: ${bagian[1]}")
+    }
 
     // TODO 3: Gunakan require() lagi untuk memastikan umur >= 0 dan nama
     //         tidak kosong, dengan pesan error yang sesuai.
+    require(nama.isNotBlank()) { "Nama pada tiket tidak boleh kosong" }
+    require(umur >= 0) { "Umur tidak boleh negatif: $umur" }
 
     return Tiket(nama, umur)
 }
@@ -37,6 +46,13 @@ fun main() {
         //         BEBERAPA blok catch (multi-catch) untuk menangani
         //         IllegalArgumentException dan IllegalStateException secara
         //         terpisah, lalu cetak hasil atau pesan errornya.
-        println(parseTiket(input))
+        try {
+            val tiket = parseTiket(input)
+            println("Berhasil: $tiket")
+        } catch (e: IllegalArgumentException) {
+            println("Gagal validasi argumen [$input]: ${e.message}")
+        } catch (e: IllegalStateException) {
+            println("Gagal konversi status [$input]: ${e.message}")
+        }
     }
 }
