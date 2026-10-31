@@ -15,9 +15,9 @@
 
 // TODO 1: Tambahkan modifier `inline` pada fungsi ini
 // TODO 2: Ubah <T> menjadi <reified T> agar T bisa dipakai di `is` check
-fun <T> isType(value: Any): Boolean {
+inline fun <reified T> isType(value: Any): Boolean {
     // TODO 3: Ganti baris di bawah dengan: return value is T
-    TODO("Lengkapi implementasi isType()")
+    return value is T
 }
 
 fun main() {
@@ -29,4 +29,15 @@ fun main() {
     // Kenapa `fun <T> isType(value: Any): Boolean = value is T` TIDAK BISA
     // dikompilasi tanpa `inline` + `reified`? Jelaskan hubungannya dengan
     // type erasure pada JVM bytecode.
+
+    // Karena JVM menerapkan "Type Erasure" pada bytecode: saat kompilasi ke .class, parameter generik <T>
+    // dihapus dan diganti menjadi tipe dasarnya. Akibatnya, pada saat runtime,
+    // JVM tidak lagi mengetahui kelas konkret apa yang dimasukkan ke T, sehingga instruksi `is T`
+    // menjadi mustahil dieksekusi oleh JVM.
+    //
+    // Dengan menambahkan modifier `inline`, compiler menyalin seluruh isi fungsi langsung ke call-site.
+    // Karena pada call-site tipe konkretnya sudah diketahui secara eksplisit,
+    // modifier `reified` memerintahkan compiler untuk mengganti `T`
+    // secara langsung dengan tipe aslinya. Dengan demikian, pengecekan tipe
+    // konkret dapat berhasil tanpa terkena dampak type erasure di runtime.
 }
