@@ -20,25 +20,31 @@ class CalculatorTest {
     @DisplayName("Penjumlahan dua bilangan positif")
     fun testAdd() {
         // TODO 1 (Arrange): siapkan dua bilangan, misalnya a = 2 dan b = 3
+        val a = 2
+        val b = 3
         // TODO 2 (Act): panggil calculator.add(a, b) dan simpan hasilnya
+        val hasil = calculator.add(a, b)
         // TODO 3 (Assert): assertEquals(5, hasil)
-
-        fail("TODO: lengkapi testAdd()")
+        assertEquals(5, hasil)
     }
 
     @Test
     @DisplayName("Pengurangan yang menghasilkan angka negatif")
     fun testSubtractNegativeResult() {
         // TODO: lakukan Arrange-Act-Assert untuk memverifikasi 3 - 5 = -2
-
-        fail("TODO: lengkapi testSubtractNegativeResult()")
+        val a = 3
+        val b = 5
+        val hasil = calculator.subtract(a, b)
+        assertEquals(-2, hasil)
     }
 
     @Test
     @DisplayName("Pembagian dua bilangan bulat")
     fun testDivide() {
         // TODO: lakukan Arrange-Act-Assert untuk memverifikasi 10 / 2 = 5
-
-        fail("TODO: lengkapi testDivide()")
+        val a = 10
+        val b = 2
+        val hasil = calculator.divide(a, b)
+        assertEquals(5, hasil)
     }
 }

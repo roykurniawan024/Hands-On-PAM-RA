@@ -17,10 +17,11 @@ class BankAccountTest {
     @DisplayName("Deposit menambah saldo dengan benar")
     fun testDeposit() {
         // TODO 1 (Arrange): buat BankAccount dengan saldo awal 100.0
+        val account = BankAccount(100.0)
         // TODO 2 (Act): panggil deposit(50.0)
+        account.deposit(50.0)
         // TODO 3 (Assert): assertEquals(150.0, account.balance)
-
-        fail("TODO: lengkapi testDeposit()")
+        assertEquals(150.0, account.balance)
     }
 
     @Test
@@ -28,18 +29,21 @@ class BankAccountTest {
     fun testWithdrawSufficientBalance() {
         // TODO: Arrange-Act-Assert untuk saldo awal 100.0, withdraw 40.0,
         // hasil akhir harus 60.0
-
-        fail("TODO: lengkapi testWithdrawSufficientBalance()")
+        val account = BankAccount(100.0)
+        account.withdraw(40.0)
+        assertEquals(60.0, account.balance)
     }
 
     @Test
     @DisplayName("Withdraw melempar InsufficientFundsException saat saldo tidak cukup")
     fun testWithdrawInsufficientBalance() {
         // TODO 1 (Arrange): buat BankAccount dengan saldo awal 50.0
+        val account = BankAccount(50.0)
         // TODO 2 (Act + Assert): gunakan
         //   assertThrows<InsufficientFundsException> { account.withdraw(100.0) }
         // untuk memastikan exception yang tepat dilempar
-
-        fail("TODO: lengkapi testWithdrawInsufficientBalance()")
+        assertThrows<InsufficientFundsException> {
+            account.withdraw(100.0)
+        }
     }
 }
