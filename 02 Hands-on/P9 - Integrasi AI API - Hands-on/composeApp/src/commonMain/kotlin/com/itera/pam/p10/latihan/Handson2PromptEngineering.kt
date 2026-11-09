@@ -21,12 +21,12 @@ import kotlinx.coroutines.launch
 // pertanyaan pengguna, supaya gaya jawaban AI konsisten.
 
 fun buildPrompt(userInput: String): String {
-    // TODO 1: Buat systemInstruction, misalnya:
-    //   "Kamu adalah asisten yang menjawab singkat, maksimal 2 kalimat, dalam Bahasa Indonesia."
-    // TODO 2: Gabungkan systemInstruction + userInput jadi satu prompt lengkap
-    //         (mis. dipisah baris kosong), lalu return hasilnya.
+    // TODO 1: Buat systemInstruction
+    val systemInstruction =
+        "Kamu adalah asisten yang menjawab singkat, maksimal 2 kalimat, dalam Bahasa Indonesia."
 
-    return userInput // TODO: masih mengembalikan input mentah, belum ada instruksi sistem
+    // TODO 2: Gabungkan systemInstruction + userInput jadi satu prompt lengkap
+    return "$systemInstruction\n\nPertanyaan: $userInput"
 }
 
 private val mockRepository = MockAiRepository()

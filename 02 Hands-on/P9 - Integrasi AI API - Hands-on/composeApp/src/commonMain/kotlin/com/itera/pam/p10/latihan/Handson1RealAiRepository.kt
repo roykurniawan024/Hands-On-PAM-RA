@@ -18,7 +18,12 @@ import com.itera.pam.p10.GEMINI_API_KEY
 import com.itera.pam.p10.GEMINI_BASE_URL
 import com.itera.pam.p10.GEMINI_MODEL
 import io.ktor.client.HttpClient
+import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
@@ -27,11 +32,6 @@ import kotlinx.serialization.json.Json
 // Hands-on 1: Panggil AI API Dasar (Gemini)
 // Tugas: lengkapi RealAiRepository.ask() supaya benar-benar memanggil
 // Gemini API lewat Ktor, lalu parsing responsnya menjadi teks jawaban.
-//
-// Bentuk request Gemini (POST, JSON):
-//   { "contents": [ { "parts": [ { "text": "<prompt>" } ] } ] }
-// Bentuk response (disederhanakan):
-//   { "candidates": [ { "content": { "parts": [ { "text": "<jawaban>" } ] } } ] }
 
 @Serializable
 data class GeminiPart(val text: String)
@@ -57,23 +57,41 @@ class RealAiRepository(
 ) : AiRepository {
 
     override suspend fun ask(prompt: String): Result<String> {
-        // TODO 1: Buat request body:
-        //   val requestBody = GeminiRequest(contents = listOf(GeminiContent(listOf(GeminiPart(prompt)))))
-        // TODO 2: Kirim POST ke "$GEMINI_BASE_URL/$GEMINI_MODEL:generateContent?key=$GEMINI_API_KEY"
-        //   val response = client.post(url) {
-        //       contentType(ContentType.Application.Json)
-        //       setBody(requestBody)
-        //   }
-        // TODO 3: Ambil body sebagai GeminiResponse:
-        //   val geminiResponse = response.body<GeminiResponse>()
-        // TODO 4: Ambil teks jawabannya:
-        //   val text = geminiResponse.candidates?.firstOrNull()?.content?.parts?.firstOrNull()?.text
-        //   Jika `text` null (mis. jawaban diblokir safety filter Gemini),
-        //   kembalikan Result.failure(Exception("Tidak ada jawaban dari Gemini (mungkin kena safety filter)"))
-        // TODO 5: Bungkus semuanya dalam try/catch, kembalikan Result.failure(e)
-        //   kalau terjadi exception (mis. HTTP error, network error)
+        return try {
+            // TODO 1: Buat request body
+            val requestBody = GeminiRequest(
+                contents = listOf(GeminiContent(listOf(GeminiPart(prompt))))
+            )
 
-        return Result.failure(NotImplementedError("Lengkapi TODO 1-5 di RealAiRepository.ask()"))
+            // TODO 2: Kirim POST ke endpoint Gemini
+            val url = "$GEMINI_BASE_URL/$GEMINI_MODEL:generateContent?key=$GEMINI_API_KEY"
+            val response = client.post(url) {
+                contentType(ContentType.Application.Json)
+                setBody(requestBody)
+            }
+
+            // TODO 3: Ambil body sebagai GeminiResponse
+            val geminiResponse = response.body<GeminiResponse>()
+
+            // TODO 4: Ambil teks jawabannya
+            val text = geminiResponse.candidates
+                ?.firstOrNull()
+                ?.content
+                ?.parts
+                ?.firstOrNull()
+                ?.text
+
+            if (text != null) {
+                Result.success(text)
+            } else {
+                Result.failure(
+                    Exception("Tidak ada jawaban dari Gemini (mungkin kena safety filter atau API key belum valid)")
+                )
+            }
+        } catch (e: Exception) {
+            // TODO 5: Tangkap exception dan kembalikan Result.failure(e)
+            Result.failure(e)
+        }
     }
 }
 
