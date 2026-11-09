@@ -6,6 +6,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
@@ -16,19 +20,18 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun Handson2Screen() {
-    // TODO 1: Buat state `count` dengan nilai awal 0:
-    //         var count by remember { mutableStateOf(0) }
-    // (butuh import androidx.compose.runtime.getValue/setValue/mutableStateOf/remember)
+    // TODO 1: Buat state `count` dengan nilai awal 0
+    var count by remember { mutableStateOf(0) }
 
     Column(modifier = Modifier.padding(16.dp)) {
         Text("Hands-on 2: Counter")
-        Text("Nilai: ???") // TODO 2: ganti "???" dengan nilai count
+        Text("Nilai: $count") // TODO 2: tampilkan nilai count
 
         Row {
-            Button(onClick = { /* TODO 3: tambah count */ }) {
+            Button(onClick = { count++ }) { // TODO 3: tambah count
                 Text("+")
             }
-            Button(onClick = { /* TODO 4: kurangi count */ }) {
+            Button(onClick = { count-- }) { // TODO 4: kurangi count
                 Text("-")
             }
         }
