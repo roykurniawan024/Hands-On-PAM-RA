@@ -8,15 +8,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
+import androidx.navigation.toRoute
+import kotlinx.serialization.Serializable
 
-// Hands-on 2: Passing Data via Arguments
-// Tugas: dari daftar item di Home, kirim `itemId` sebagai argumen route ke
-// Detail, lalu tampilkan item yang sesuai.
+@Serializable
+internal data object Handson2Home
+
+@Serializable
+internal data class Handson2Detail(val itemId: Int)
 
 private data class Item(val id: Int, val nama: String)
 
@@ -30,25 +32,13 @@ private val daftarItem = listOf(
 fun Handson2Screen() {
     val navController = rememberNavController()
 
-    // TODO 1: NavHost(navController, startDestination = "home") { ... }
-    NavHost(navController = navController, startDestination = "home") {
-    // TODO 2: composable("home") { HomeListScreen(navController) }
-        composable("home") {
+    NavHost(navController = navController, startDestination = Handson2Home) {
+        composable<Handson2Home> {
             HomeListScreen(navController)
         }
-    // TODO 3: composable(
-    //             route = "detail/{itemId}",
-    //             arguments = listOf(navArgument("itemId") { type = NavType.IntType })
-    //         ) { backStackEntry ->
-    //             val itemId = backStackEntry.arguments?.getInt("itemId") ?: -1
-    //             DetailItemScreen(navController, itemId)
-    //         }
-        composable(
-            route = "detail/{itemId}",
-            arguments = listOf(navArgument("itemId") { type = NavType.IntType })
-        ) { backStackEntry ->
-            val itemId = backStackEntry.arguments?.getInt("itemId") ?: -1
-            DetailItemScreen(navController, itemId)
+        composable<Handson2Detail> { backStackEntry ->
+            val route = backStackEntry.toRoute<Handson2Detail>()
+            DetailItemScreen(navController, route.itemId)
         }
     }
 }
@@ -59,8 +49,7 @@ private fun HomeListScreen(navController: NavHostController) {
         Text("Daftar Item")
         daftarItem.forEach { item ->
             Button(onClick = {
-                // TODO 4: navController.navigate("detail/${item.id}")
-                navController.navigate("detail/${item.id}")
+                navController.navigate(Handson2Detail(item.id))
             }) {
                 Text(item.nama)
             }
