@@ -2,15 +2,18 @@ package com.itera.pam.p7.db
 
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
+import java.io.File
 
 actual class DatabaseDriverFactory {
     actual fun createDriver(): SqlDriver {
-        // Driver JDBC SQLite tidak otomatis membuat tabel — kita harus
-        // memanggil AppDatabase.Schema.create(driver) secara manual sekali
-        // sebelum digunakan (berbeda dari AndroidSqliteDriver/NativeSqliteDriver
-        // yang sudah menangani ini secara otomatis lewat parameter `schema`).
-        val driver: SqlDriver = JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY)
-        AppDatabase.Schema.create(driver)
+        val dbDir = File(System.getProperty("user.home"), ".handson-pam-p7")
+        if (!dbDir.exists()) dbDir.mkdirs()
+        val dbFile = File(dbDir, "catatan_p7.db")
+        val isNewDatabase = !dbFile.exists() || dbFile.length() == 0L
+        val driver: SqlDriver = JdbcSqliteDriver("jdbc:sqlite:${dbFile.absolutePath}")
+        if (isNewDatabase) {
+            AppDatabase.Schema.create(driver)
+        }
         return driver
     }
 }

@@ -1,0 +1,15 @@
+CREATE TABLE Draf (
+    id INTEGER NOT NULL PRIMARY KEY,
+    judul TEXT NOT NULL,
+    lokasi TEXT NOT NULL
+);
+
+ambil:
+SELECT * FROM Draf WHERE id = 1;
+
+simpan:
+INSERT OR REPLACE INTO Draf(id, judul, lokasi)
+VALUES (1, ?, ?);
+
+hapus:
+DELETE FROM Draf WHERE id = 1;

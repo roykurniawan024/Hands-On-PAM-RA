@@ -1,0 +1,20 @@
+CREATE TABLE Laporan (
+    id INTEGER NOT NULL PRIMARY KEY,
+    judul TEXT NOT NULL,
+    lokasi TEXT NOT NULL,
+    status TEXT NOT NULL,
+    petugas TEXT
+);
+
+semua:
+SELECT * FROM Laporan ORDER BY id DESC;
+
+byId:
+SELECT * FROM Laporan WHERE id = ?;
+
+simpan:
+INSERT OR REPLACE INTO Laporan(id, judul, lokasi, status, petugas)
+VALUES (?, ?, ?, ?, ?);
+
+hapusSemua:
+DELETE FROM Laporan;

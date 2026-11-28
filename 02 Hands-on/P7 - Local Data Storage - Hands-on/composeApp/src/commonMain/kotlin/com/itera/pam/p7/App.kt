@@ -20,12 +20,14 @@ import com.itera.pam.p7.db.AppDatabase
 import com.itera.pam.p7.latihan.Handson1Screen
 import com.itera.pam.p7.latihan.Handson2Screen
 import com.itera.pam.p7.latihan.Handson3Screen
+import com.itera.pam.p7.latihan.LaporKampusScreen
 
 private enum class Screen(val label: String) {
     Menu("Menu"),
     Latihan1("Latihan 1 - Preferensi Sederhana"),
     Latihan2("Latihan 2 - SQLDelight Repository"),
     Latihan3("Latihan 3 - Offline Notes"),
+    LaporKampus("LaporKampus - Offline & Draf"),
 }
 
 @Composable
@@ -55,6 +57,7 @@ fun App(database: AppDatabase) {
                     Screen.Latihan1 -> Handson1Screen(database)
                     Screen.Latihan2 -> Handson2Screen(database)
                     Screen.Latihan3 -> Handson3Screen(database)
+                    Screen.LaporKampus -> LaporKampusScreen(database)
                 }
             }
         }
