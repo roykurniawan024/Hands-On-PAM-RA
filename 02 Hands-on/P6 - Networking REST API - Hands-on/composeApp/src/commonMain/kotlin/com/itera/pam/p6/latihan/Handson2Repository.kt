@@ -12,23 +12,46 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import io.ktor.client.network.sockets.ConnectTimeoutException
+import io.ktor.client.network.sockets.SocketTimeoutException
+import io.ktor.client.plugins.ClientRequestException
+import io.ktor.client.plugins.HttpRequestTimeoutException
+import io.ktor.client.plugins.RedirectResponseException
+import io.ktor.client.plugins.ServerResponseException
+import io.ktor.serialization.JsonConvertException
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.io.IOException
+import kotlinx.serialization.SerializationException
 
-// Hands-on 2: Repository Pattern & Loading State
-// Bungkus fetchUsers() (dari Handson1KtorClient.kt) di balik sebuah Repository,
-// lalu buat state holder sederhana yang merepresentasikan status pengambilan
-// data: Loading / Success / Error.
+fun pesanUntuk(e: Throwable): String = when (e) {
+    is CancellationException -> throw e
+    is RedirectResponseException -> "Permintaan dialihkan (${e.response.status.value})."
+    is ClientRequestException -> when (e.response.status.value) {
+        401, 403 -> "Akses ditolak."
+        404 -> "Data tidak ditemukan."
+        else -> "Permintaan tidak valid (${e.response.status.value})."
+    }
+    is ServerResponseException -> "Server sedang bermasalah (${e.response.status.value})."
+    is HttpRequestTimeoutException,
+    is ConnectTimeoutException,
+    is SocketTimeoutException -> "Koneksi timeout. Coba lagi nanti."
+    is JsonConvertException,
+    is SerializationException -> "Format data dari server tidak sesuai."
+    is IOException -> "Tidak ada koneksi internet atau server tidak terjangkau."
+    else -> "Terjadi kesalahan: ${e.message ?: "tidak diketahui"}"
+}
 
 class UserRepository {
     suspend fun getUsers(): List<RemoteUser> = fetchUsers()
 }
 
-sealed class UiState {
-    data object Loading : UiState()
-    data class Success(val users: List<RemoteUser>) : UiState()
-    data class Error(val message: String) : UiState()
+sealed interface UiState {
+    data object Loading : UiState
+    data class Success(val users: List<RemoteUser>) : UiState
+    data class Error(val message: String) : UiState
 }
 
 class UserListStateHolder(
@@ -38,16 +61,12 @@ class UserListStateHolder(
     val state: StateFlow<UiState> = _state.asStateFlow()
 
     suspend fun load() {
-        // TODO 1: set _state.value ke UiState.Loading sebelum mulai fetch
         _state.value = UiState.Loading
         try {
-            // TODO 2: panggil repository.getUsers() di dalam try-catch
             val users = repository.getUsers()
-            // TODO 3: jika berhasil, set _state.value ke UiState.Success(users)
             _state.value = UiState.Success(users)
         } catch (e: Exception) {
-            // TODO 4: jika gagal (catch Exception e), set _state.value ke UiState.Error(...)
-            _state.value = UiState.Error(e.message ?: "Terjadi kesalahan")
+            _state.value = UiState.Error(pesanUntuk(e))
         }
     }
 }
@@ -66,12 +85,12 @@ fun Handson2Screen() {
         Spacer(modifier = Modifier.height(8.dp))
 
         when (val state = uiState) {
-            is UiState.Loading -> Text("Sedang memuat data (Loading)...")
+            UiState.Loading -> Text("Sedang memuat data (Loading)...")
             is UiState.Success -> {
                 Text("Berhasil memuat ${state.users.size} user:")
                 Spacer(modifier = Modifier.height(4.dp))
                 state.users.forEach { user ->
-                    Text("• ${user.name} (${user.email})")
+                    Text("- ${user.name} (${user.email})")
                 }
             }
             is UiState.Error -> Text("Error: ${state.message}")
